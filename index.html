@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>クエスチョンカード生成ツール</title>
+    <title>問いかけカード生成ツール</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
@@ -2389,7 +2389,7 @@
 <body>
     <div class="header">
         <div class="header-content">
-            <h1>パターン・カード生成ツール</h1>
+            <h1>問いかけカード生成ツール</h1>
         </div>
     </div>
 
@@ -2399,7 +2399,7 @@
             <div class="sidebar">
                 <div class="info-panel">
                     <h3>📚 井庭崇先生のパターン・ランゲージを活用したクリエティブ・ラーニング研究から着想を得たツール</h3>
-                    <p>井庭先生の創造的学習のための40のパターン（<a href="https://gakkai.sfc.keio.ac.jp/journal/.assets/SFCJ14-1-05.pdf" target="_blank">論文1</a>・<a href="https://web.sfc.keio.ac.jp/~iba/papers/PURPLSOC14_Dialogue.pdf" target="_blank">論文2</a>・<a href="https://creativeshift.co.jp/pattern-lang/" target="_blank">Webページ</a>）を参考にした質問カード（プリセット分）を出力したり、オリジナルのクエスチョンカードを作成して出力することができます。</p>
+                    <p>井庭先生の創造的学習のための40のパターン（<a href="https://gakkai.sfc.keio.ac.jp/journal/.assets/SFCJ14-1-05.pdf" target="_blank">論文1</a>・<a href="https://web.sfc.keio.ac.jp/~iba/papers/PURPLSOC14_Dialogue.pdf" target="_blank">論文2</a>・<a href="https://creativeshift.co.jp/pattern-lang/" target="_blank">Webページ</a>）を参考にした質問カード（プリセット分）を出力したり、オリジナルの問いかけカードを作成して出力することができます。</p>
                 </div>
 
                 <div class="form-group">
@@ -2621,7 +2621,7 @@
                         <div class="ai-guide-header" onclick="toggleAIGuide()">
                             <div class="ai-guide-title">
                                 <span>🤖</span>
-                                <span>AIを活用したパターン・カードの作成 - CSV自動生成プロンプト</span>
+                                <span>AIを活用した問いかけカードの作成 - CSV自動生成プロンプト</span>
                                 <button class="help-button" onclick="event.stopPropagation(); showAIHelp()" title="使い方ガイドを表示">?</button>
                             </div>
                             <span class="ai-guide-toggle expanded" id="aiGuideToggle">▲</span>
@@ -2818,7 +2818,7 @@ pattern_number,title,description
                             <div class="guide-content" id="csvGuideContent" style="display: none;">
                                 <div class="guide-intro">
                                     <h4>🎯 CSVファイルを使った最速カード生成</h4>
-                                    <p>CSVファイルがあれば1-2分で複数のクエスチョンカードを一括生成できます。</p>
+                                    <p>CSVファイルがあれば1-2分で複数の問いかけカードを一括生成できます。</p>
                                 </div>
                                 
                                 <div class="csv-guide-steps">
@@ -2910,7 +2910,7 @@ pattern_number,title,description
                                                 <span class="template-icon">🤖</span>
                                                 <strong>AI自動生成を利用</strong>
                                             </div>
-                                            <p>書籍やテーマを指定してクエスチョンカードのCSVデータを自動生成できます。</p>
+                                            <p>書籍やテーマを指定して問いかけカードのCSVデータを自動生成できます。</p>
                                             <button class="csv-template-btn secondary" onclick="openAIGuideSection()">
                                                 🤖 AI生成セクションへ
                                             </button>
@@ -3156,7 +3156,7 @@ pattern_number,title,description
 
 
                     <div id="preset-batch-section" class="preset-batch-header" onclick="togglePresetBatch()" style="cursor: pointer; margin-bottom: 20px; padding: 15px; background: #f8f9ff; border: 2px solid #e1e8ed; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease;">
-                        <h2 style="margin: 0; color: #444;">📦 クエスチョンカード（プリセット）一括生成</h2>
+                        <h2 style="margin: 0; color: #444;">📦 問いかけカード（プリセット）一括生成</h2>
                         <span id="presetBatchToggle" style="font-size: 20px; color: #666; transition: transform 0.3s ease;">▼</span>
                     </div>
                     
@@ -5999,7 +5999,7 @@ pattern_number,title,description
                 }
                 
                 // 基本HTML構造を作成
-                newWindow.document.write('<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>クエスチョンカード スライドショー</title></head><body></body></html>');
+                newWindow.document.write('<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><title>問いかけカード スライドショー</title></head><body></body></html>');
                 newWindow.document.close();
                 
                 // CSSスタイルを追加
@@ -6044,7 +6044,7 @@ pattern_number,title,description
                 // HTMLコンテンツを追加
                 newWindow.document.body.innerHTML = `
                     <div class="slideshow-container">
-                        <div class="header"><h1>📚 クエスチョンカード スライドショー ✨ 高解像度（${888*2}×${600*2}px）</h1></div>
+                        <div class="header"><h1>📚 問いかけ スライドショー ✨ 高解像度（${888*2}×${600*2}px）</h1></div>
                         <div class="card-display">
                             <img id="cardImage" class="card-image" src="${cardsData[0].imageUrl}" alt="Pattern Card">
                             <div class="card-info">
