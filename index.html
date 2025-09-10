@@ -2409,9 +2409,42 @@
             background: #f9f9f9;
         }
 
-        /* 背景作成方式のラジオボタンスタイル */
-        input[name="backgroundMethod"] {
-            accent-color: #667eea;
+        /* 背景作成方式の選択ボタンスタイル */
+        .method-selector {
+            flex: 1; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            padding: 12px 16px; 
+            border: 2px solid #ddd; 
+            border-radius: 8px; 
+            background: #ffffff; 
+            transition: all 0.2s ease; 
+            min-height: 48px;
+        }
+
+        .method-selector:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .method-selector.selected {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .method-selector.selected span {
+            color: #667eea !important;
+            font-weight: 600;
+        }
+
+        .method-selector span {
+            font-size: 14px; 
+            font-weight: 500; 
+            color: #666; 
+            text-align: center;
+            transition: color 0.2s ease;
         }
 
         /* 背景生成ボタンのホバー効果 */
@@ -2497,15 +2530,15 @@
 
                 <div class="form-group" id="customBackgroundGroup" style="display: none;">
                     <div style="margin-bottom: 15px;">
-                        <h4 style="margin: 0 0 10px 0; color: #444; font-size: 16px;">🎨 カスタム背景の作成方法を選択</h4>
-                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                            <label style="display: flex; align-items: center; cursor: pointer;">
-                                <input type="radio" name="backgroundMethod" value="upload" checked style="margin-right: 6px;">
-                                <span style="font-size: 14px;">📁 画像ファイルをアップロード</span>
+                        <h4 style="margin: 0 0 12px 0; color: #444; font-size: 16px;">🎨 カスタム背景の作成方法を選択</h4>
+                        <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+                            <label class="method-selector selected">
+                                <input type="radio" name="backgroundMethod" value="upload" checked style="display: none;">
+                                <span>📁 画像ファイルをアップロード</span>
                             </label>
-                            <label style="display: flex; align-items: center; cursor: pointer;">
-                                <input type="radio" name="backgroundMethod" value="generate" style="margin-right: 6px;">
-                                <span style="font-size: 14px;">🛠️ 絵文字パターンを生成</span>
+                            <label class="method-selector">
+                                <input type="radio" name="backgroundMethod" value="generate" style="display: none;">
+                                <span>🛠️ 絵文字パターンを生成</span>
                             </label>
                         </div>
                     </div>
@@ -2557,15 +2590,12 @@
                             </div>
                             
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <button type="button" id="generateBgBtn" onclick="generateCustomBackground()" style="padding: 6px 12px; font-size: 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                <button type="button" id="generateBgBtn" onclick="generateCustomBackground()" style="flex: 1; padding: 6px 12px; font-size: 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">
                                     🎨 背景生成
                                 </button>
-                                <button type="button" id="previewBgBtn" onclick="toggleBackgroundPreview()" style="padding: 6px 12px; font-size: 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                <button type="button" id="previewBgBtn" onclick="toggleBackgroundPreview()" style="flex: 1; padding: 6px 12px; font-size: 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
                                     👁️ プレビュー
                                 </button>
-                                <small style="color: #666; font-size: 11px;">
-                                    生成サイズ: 888×600px（カードサイズに最適化）
-                                </small>
                             </div>
                             
                             <!-- 背景プレビューエリア -->
@@ -3869,11 +3899,18 @@ pattern_number,title,description
         // 背景作成方式切り替え処理
         function setupBackgroundMethodListeners() {
             const methodRadios = document.querySelectorAll('input[name="backgroundMethod"]');
+            const methodLabels = document.querySelectorAll('.method-selector');
             const uploadSection = document.getElementById('uploadBackgroundSection');
             const generateSection = document.getElementById('generateBackgroundSection');
             
-            methodRadios.forEach(radio => {
+            methodRadios.forEach((radio, index) => {
                 radio.addEventListener('change', function() {
+                    // 全てのラベルから選択状態を削除
+                    methodLabels.forEach(label => label.classList.remove('selected'));
+                    
+                    // 現在選択されたラベルに選択状態を追加
+                    methodLabels[index].classList.add('selected');
+                    
                     if (this.value === 'upload') {
                         uploadSection.style.display = 'block';
                         generateSection.style.display = 'none';
@@ -3883,6 +3920,14 @@ pattern_number,title,description
                         // 背景生成セクションの入力フィールドにイベントリスナーを設定
                         setupBackgroundGeneratorListeners();
                     }
+                });
+            });
+
+            // ラベルクリック時にラジオボタンを選択
+            methodLabels.forEach((label, index) => {
+                label.addEventListener('click', function() {
+                    methodRadios[index].checked = true;
+                    methodRadios[index].dispatchEvent(new Event('change'));
                 });
             });
         }
