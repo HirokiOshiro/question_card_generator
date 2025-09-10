@@ -4279,7 +4279,7 @@ pattern_number,title,description
                     top: (20 - 2) * scaleFactor,
                     width: seriesTextWidth + (8 * scaleFactor),
                     height: seriesTextHeight + (4 * scaleFactor),
-                    fill: 'rgba(255, 255, 255, 0.8)',
+                    fill: 'rgba(255, 255, 255, 1.0)',
                     rx: 0,
                     ry: 0,
                     selectable: false
@@ -4399,7 +4399,7 @@ pattern_number,title,description
             
             // 説明 - スケール調整対応
             if (description) {
-                const formattedDescription = insertLineBreaks(description, 32); // 文字数を36から32に調整
+                const formattedDescription = insertLineBreaks(description, 30); // 文字数を36から30に調整
                 const descText = new fabric.Textbox(formattedDescription, {
                     left: 75 * scaleFactor,
                     top: yPosition,
@@ -4444,7 +4444,7 @@ pattern_number,title,description
                     top: (baseHeight - 46) * scaleFactor,
                     width: creatorTextWidth + (8 * scaleFactor),
                     height: 16 * scaleFactor, // テキストに適したサイズ
-                    fill: 'rgba(255, 255, 255, 0.8)',
+                    fill: 'rgba(255, 255, 255, 1.0)',
                     rx: 0,
                     ry: 0,
                     selectable: false
@@ -4599,13 +4599,35 @@ pattern_number,title,description
             // 作成者アイコンを正しいサイズで追加
             if (creatorIconImage) {
                 const iconClone = fabric.util.object.clone(creatorIconImage);
+                
+                // 比率を維持しながら25pxの枠内に収める計算（エクスポート用スケール適用）
+                const maxSize = 25;
+                const originalWidth = iconClone.width;
+                const originalHeight = iconClone.height;
+                const aspectRatio = originalWidth / originalHeight;
+                
+                let targetWidth, targetHeight;
+                if (aspectRatio > 1) {
+                    // 横長の場合：幅を基準にする
+                    targetWidth = maxSize;
+                    targetHeight = maxSize / aspectRatio;
+                } else {
+                    // 縦長または正方形の場合：高さを基準にする
+                    targetWidth = maxSize * aspectRatio;
+                    targetHeight = maxSize;
+                }
+                
+                const baseScale = Math.min(targetWidth / originalWidth, targetHeight / originalHeight);
+                const exportScaleX = (exportWidth * multiplier) / baseWidth;
+                const exportScaleY = (exportHeight * multiplier) / baseHeight;
+                
                 iconClone.set({
-                    left: (843 - 25 - 4 + (25 + 8)/2) * (exportWidth * multiplier) / baseWidth, // 背景四角の中央に配置
-                    top: (baseHeight - 54 + (25 + 8)/2) * (exportHeight * multiplier) / baseHeight, // 背景四角の中央に配置
+                    left: (843 - 25 - 4 + (25 + 8)/2) * exportScaleX, // 背景四角の中央に配置
+                    top: (baseHeight - 54 + (25 + 8)/2) * exportScaleY, // 背景四角の中央に配置
                     originX: 'center', // 中央基準で配置
                     originY: 'center', // 中央基準で配置
-                    scaleX: (25 / iconClone.width) * (exportWidth * multiplier) / baseWidth,
-                    scaleY: (25 / iconClone.height) * (exportHeight * multiplier) / baseHeight,
+                    scaleX: baseScale * exportScaleX,
+                    scaleY: baseScale * exportScaleY, // 比率維持のため同じベーススケールを使用
                     selectable: false
                 });
                 tempCanvas.add(iconClone);
@@ -5242,7 +5264,7 @@ pattern_number,title,description
             let confirmMessage = `${csvData.length}枚のカードを生成します。\n現在選択中のテンプレート「${currentTemplate}」を全カードに適用します。\nファイル名形式：${safeGroupName}_1.png, ${safeGroupName}_2.png...\n`;
             
             if (downloadMethod === 'zip') {
-                confirmMessage += `\nダウンロード方式：ZIP一括ダウンロード\nZIPファイル名：${safeGroupName}_pattern_cards.zip`;
+                confirmMessage += `\nダウンロード方式：ZIP一括ダウンロード\nZIPファイル名：${safeGroupName}_cards.zip`;
             } else {
                 confirmMessage += `\nダウンロード方式：個別ダウンロード`;
             }
@@ -5395,7 +5417,7 @@ pattern_number,title,description
                 
                 // ZIPファイルをダウンロード
                 const link = document.createElement('a');
-                link.download = `${safeGroupName}_pattern_cards.zip`;
+                link.download = `${safeGroupName}_cards.zip`;
                 link.href = URL.createObjectURL(content);
                 document.body.appendChild(link);
                 link.click();
@@ -5404,7 +5426,7 @@ pattern_number,title,description
                 // オブジェクトURLを解放
                 URL.revokeObjectURL(link.href);
                 
-                alert(`ZIP一括生成が完了しました！\n生成数: ${completed}枚\nテンプレート: ${currentTemplate}\nZIPファイル: ${safeGroupName}_pattern_cards.zip`);
+                alert(`ZIP一括生成が完了しました！\n生成数: ${completed}枚\nテンプレート: ${currentTemplate}\nZIPファイル: ${safeGroupName}_cards.zip`);
                 
             } catch (error) {
                 console.error('ZIP一括生成エラー:', error);
