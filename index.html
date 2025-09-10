@@ -4459,7 +4459,7 @@ pattern_number,title,description
                     top: (baseHeight - 54) * scaleFactor,
                     width: (25 + 8) * scaleFactor,
                     height: (25 + 8) * scaleFactor, // アイコンサイズに適したサイズ
-                    fill: 'rgba(255, 255, 255, 0.8)',
+                    fill: 'rgba(255, 255, 255, 1.0)',
                     rx: 0,
                     ry: 0,
                     selectable: false
@@ -4475,13 +4475,33 @@ pattern_number,title,description
             // 作成者アイコン（右下右側）- 背景と合わせて配置
             if (creatorIconImage) {
                 const iconClone = fabric.util.object.clone(creatorIconImage);
+                
+                // 比率を維持しながら25pxの枠内に収める計算
+                const maxSize = 25;
+                const originalWidth = iconClone.width;
+                const originalHeight = iconClone.height;
+                const aspectRatio = originalWidth / originalHeight;
+                
+                let targetWidth, targetHeight;
+                if (aspectRatio > 1) {
+                    // 横長の場合：幅を基準にする
+                    targetWidth = maxSize;
+                    targetHeight = maxSize / aspectRatio;
+                } else {
+                    // 縦長または正方形の場合：高さを基準にする
+                    targetWidth = maxSize * aspectRatio;
+                    targetHeight = maxSize;
+                }
+                
+                const scale = Math.min(targetWidth / originalWidth, targetHeight / originalHeight);
+                
                 iconClone.set({
                     left: (843 - 25 - 4 + (25 + 8)/2) * scaleFactor, // 背景四角の中央に配置
                     top: (baseHeight - 54 + (25 + 8)/2) * scaleFactor, // 背景四角の中央に配置
                     originX: 'center', // 中央基準で配置
                     originY: 'center', // 中央基準で配置
-                    scaleX: (25 / iconClone.width) * scaleFactor,
-                    scaleY: (25 / iconClone.height) * scaleFactor,
+                    scaleX: scale * scaleFactor,
+                    scaleY: scale * scaleFactor, // X軸Y軸で同じスケールを使用して比率維持
                     selectable: false,
                     isCreatorIcon: true // 作成者アイコンであることを示すフラグ
                 });
