@@ -248,13 +248,10 @@
         }
         
         .template-academic { background: linear-gradient(135deg, #ffffff, #d0d0d0); }
-        .template-nature { background: linear-gradient(135deg, #259e56, #f4f269); }
-        .template-warm { background: linear-gradient(135deg, #fff95b, #ff930f); }
-        .template-elegant { background: linear-gradient(135deg, #d4af37, #c0c0c0); }
         .template-pastel { background: linear-gradient(135deg, #e9e9b7, #d3f3f1); }
         .template-spring { background: linear-gradient(135deg, #fce9d7, #eed4e8); }
         .template-summer { background: linear-gradient(135deg, #f6f6f6, #2c6cbc); }
-        .template-autumn { background: linear-gradient(135deg, #f0c400, #e1a3c7); }
+        .template-autumn { background: linear-gradient(135deg, #ffe883, #e18cbe); }
         .template-winter { background: linear-gradient(135deg, #f1f5f9, #475569); }
         .template-custom { background: linear-gradient(135deg, #f5f5f5, #e8e8e8); }
         
@@ -2384,6 +2381,61 @@
             border: 1px solid #e1e8ed;
             border-radius: 8px;
         }
+        
+        /* 背景ジェネレーター関連スタイル */
+        .bg-generator-controls input[type="number"],
+        .bg-generator-controls input[type="text"],
+        .bg-generator-controls input[type="color"] {
+            font-size: 12px !important;
+            padding: 4px !important;
+            border: 1px solid #ddd !important;
+            border-radius: 4px !important;
+        }
+
+        .bg-generator-controls input[type="color"] {
+            cursor: pointer;
+            padding: 0 !important;
+        }
+
+        .bg-generator-controls input[type="number"]:focus,
+        .bg-generator-controls input[type="text"]:focus {
+            border-color: #667eea !important;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1) !important;
+        }
+
+        #backgroundPreviewCanvas {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+
+        /* 背景作成方式のラジオボタンスタイル */
+        input[name="backgroundMethod"] {
+            accent-color: #667eea;
+        }
+
+        /* 背景生成ボタンのホバー効果 */
+        #generateBgBtn:hover {
+            background: #5a67d8 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+        }
+
+        #previewBgBtn:hover {
+            background: #218838 !important;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+        }
+
+        /* 背景ジェネレーターのトランジション効果 */
+        #generateBackgroundSection,
+        #uploadBackgroundSection {
+            transition: all 0.3s ease;
+        }
+
+        #backgroundPreview {
+            transition: all 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -2416,15 +2468,6 @@
                         <div class="template-btn template-academic active" data-template="academic" onclick="selectTemplate('academic')">
                             アカデミック
                         </div>
-                        <div class="template-btn template-nature" data-template="nature" onclick="selectTemplate('nature')">
-                            ナチュラル
-                        </div>
-                        <div class="template-btn template-warm" data-template="warm" onclick="selectTemplate('warm')">
-                            ウォーム
-                        </div>
-                        <div class="template-btn template-elegant" data-template="elegant" onclick="selectTemplate('elegant')">
-                            エレガント
-                        </div>
                         
                         <!-- 新テーマ -->
                         <div class="template-btn template-pastel" data-template="pastel" onclick="selectTemplate('pastel')">
@@ -2453,11 +2496,84 @@
                 </div>
 
                 <div class="form-group" id="customBackgroundGroup" style="display: none;">
-                    <label for="backgroundUpload">背景画像をアップロード</label>
-                    <input type="file" id="backgroundUpload" accept="image/*" onchange="handleBackgroundUpload(event)">
-                    <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
-                        推奨サイズ: 選択した解像度に応じて自動調整されます（アスペクト比1.48:1推奨）
-                    </small>
+                    <div style="margin-bottom: 15px;">
+                        <h4 style="margin: 0 0 10px 0; color: #444; font-size: 16px;">🎨 カスタム背景の作成方法を選択</h4>
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="backgroundMethod" value="upload" checked style="margin-right: 6px;">
+                                <span style="font-size: 14px;">📁 画像ファイルをアップロード</span>
+                            </label>
+                            <label style="display: flex; align-items: center; cursor: pointer;">
+                                <input type="radio" name="backgroundMethod" value="generate" style="margin-right: 6px;">
+                                <span style="font-size: 14px;">🛠️ 絵文字パターンを生成</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 画像アップロード方式 -->
+                    <div id="uploadBackgroundSection" style="display: block;">
+                        <label for="backgroundUpload">背景画像をアップロード</label>
+                        <input type="file" id="backgroundUpload" accept="image/*" onchange="handleBackgroundUpload(event)">
+                        <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                            推奨サイズ: 選択した解像度に応じて自動調整されます（アスペクト比1.48:1推奨）
+                        </small>
+                    </div>
+
+                    <!-- 背景生成方式 -->
+                    <div id="generateBackgroundSection" style="display: none;">
+                        <div style="background: #f8f9ff; border: 1px solid #e1e8ed; border-radius: 8px; padding: 15px;">
+                            <h4 style="margin: 0 0 12px 0; color: #444; font-size: 14px;">🎨 絵文字パターン背景ジェネレーター</h4>
+                            
+                            <div class="bg-generator-controls" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 15px;">
+                                <div>
+                                    <label style="font-size: 12px; color: #666; display: block; margin-bottom: 3px;">絵文字</label>
+                                    <input id="bgEmojiInput" type="text" value="？" maxlength="8" style="width: 100%; padding: 4px; font-size: 14px; text-align: center; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                
+                                <div>
+                                    <label style="font-size: 12px; color: #666; display: block; margin-bottom: 3px;">サイズ</label>
+                                    <input id="bgFontPx" type="number" min="24" max="200" step="1" value="30" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                
+                                <div>
+                                    <label style="font-size: 12px; color: #666; display: block; margin-bottom: 3px;">横ピッチ</label>
+                                    <input id="bgTileX" type="number" min="80" max="400" step="1" value="100" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                
+                                <div>
+                                    <label style="font-size: 12px; color: #666; display: block; margin-bottom: 3px;">縦ピッチ</label>
+                                    <input id="bgTileY" type="number" min="80" max="400" step="1" value="100" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                
+                                <div>
+                                    <label style="font-size: 12px; color: #666; display: block; margin-bottom: 3px;">段違い率</label>
+                                    <input id="bgOffsetRatio" type="number" min="0" max="100" step="1" value="50" style="width: 100%; padding: 4px; font-size: 12px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                                
+                                <div>
+                                    <label style="font-size: 12px; color: #666; display: block; margin-bottom: 3px;">背景色</label>
+                                    <input id="bgBgColor" type="color" value="#FFFFFF" style="width: 100%; height: 28px; border: 1px solid #ddd; border-radius: 4px;">
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <button type="button" id="generateBgBtn" onclick="generateCustomBackground()" style="padding: 6px 12px; font-size: 12px; background: #667eea; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                    🎨 背景生成
+                                </button>
+                                <button type="button" id="previewBgBtn" onclick="toggleBackgroundPreview()" style="padding: 6px 12px; font-size: 12px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                    👁️ プレビュー
+                                </button>
+                                <small style="color: #666; font-size: 11px;">
+                                    生成サイズ: 888×600px（カードサイズに最適化）
+                                </small>
+                            </div>
+                            
+                            <!-- 背景プレビューエリア -->
+                            <div id="backgroundPreview" style="display: none; margin-top: 12px; border: 1px solid #ddd; border-radius: 6px; overflow: hidden;">
+                                <canvas id="backgroundPreviewCanvas" width="888" height="600" style="width: 100%; max-width: 300px; height: auto; display: block;"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -3596,6 +3712,8 @@ pattern_number,title,description
             const customGroup = document.getElementById('customBackgroundGroup');
             if (template === 'custom') {
                 customGroup.style.display = 'block';
+                // 背景作成方式のリスナーを設定
+                setupBackgroundMethodListeners();
             } else {
                 customGroup.style.display = 'none';
             }
@@ -3624,13 +3742,10 @@ pattern_number,title,description
                 // 現在のテンプレートの色を初期値として設定
                 const templateColors = {
                     academic: { primary: '#ffffff', secondary: '#d0d0d0', accent: '#ffffff' },
-                    nature: { primary: '#259e56', secondary: '#f4f269', accent: '#ffffff' },
-                    warm: { primary: '#fff95b', secondary: '#ff930f', accent: '#ffffff' },
-                    elegant: { primary: '#d4af37', secondary: '#c0c0c0', accent: '#ffffff' },
                     pastel: { primary: '#e9e9b7', secondary: '#d3f3f1', accent: '#ffffff' },
                     spring: { primary: '#fce9d7', secondary: '#eed4e8', accent: '#ffffff' },
                     summer: { primary: '#f6f6f6', secondary: '#2c6cbc', accent: '#ffffff' },
-                    autumn: { primary: '#f0c400', secondary: '#e1a3c7', accent: '#ffffff' },
+                    autumn: { primary: '#ffe883', secondary: '#e18cbe', accent: '#ffffff' },
                     winter: { primary: '#f1f5f9', secondary: '#475569', accent: '#ffffff' },
                     custom: { primary: '#f5f5f5', secondary: '#e8e8e8', accent: '#ffffff' }
                 };
@@ -3747,7 +3862,133 @@ pattern_number,title,description
         // 初期化時に保存済みパレットを表示
         document.addEventListener('DOMContentLoaded', function() {
             renderSavedPalettes();
+            // 背景作成方式の初期設定
+            setupBackgroundMethodListeners();
         });
+
+        // 背景作成方式切り替え処理
+        function setupBackgroundMethodListeners() {
+            const methodRadios = document.querySelectorAll('input[name="backgroundMethod"]');
+            const uploadSection = document.getElementById('uploadBackgroundSection');
+            const generateSection = document.getElementById('generateBackgroundSection');
+            
+            methodRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'upload') {
+                        uploadSection.style.display = 'block';
+                        generateSection.style.display = 'none';
+                    } else if (this.value === 'generate') {
+                        uploadSection.style.display = 'none';
+                        generateSection.style.display = 'block';
+                        // 背景生成セクションの入力フィールドにイベントリスナーを設定
+                        setupBackgroundGeneratorListeners();
+                    }
+                });
+            });
+        }
+
+        // 背景ジェネレーターの入力変更リスナー設定
+        function setupBackgroundGeneratorListeners() {
+            const bgInputs = ['bgEmojiInput', 'bgFontPx', 'bgTileX', 'bgTileY', 'bgOffsetRatio', 'bgBgColor'];
+            bgInputs.forEach(inputId => {
+                const input = document.getElementById(inputId);
+                if (input && !input.hasAttribute('data-listener-added')) {
+                    input.addEventListener('input', () => {
+                        // プレビューが表示されている場合は自動更新
+                        const preview = document.getElementById('backgroundPreview');
+                        if (preview && preview.style.display !== 'none') {
+                            generateCustomBackgroundPreview();
+                        }
+                    });
+                    input.setAttribute('data-listener-added', 'true');
+                }
+            });
+        }
+
+        // カスタム背景画像を生成
+        function generateCustomBackground() {
+            const canvas = generateCustomBackgroundPreview();
+            if (canvas) {
+                // キャンバスから画像データを取得してFabric.jsのImageオブジェクトに変換
+                const dataURL = canvas.toDataURL('image/png', 1.0);
+                fabric.Image.fromURL(dataURL, function(img) {
+                    img.set({
+                        crossOrigin: 'anonymous'
+                    });
+                    
+                    if (img.getElement()) {
+                        img.getElement().style.imageRendering = 'high-quality';
+                    }
+                    
+                    customBackgroundImage = img;
+                    updateCard();
+                });
+            }
+        }
+
+        // 背景プレビューの生成と表示
+        function generateCustomBackgroundPreview() {
+            const previewCanvas = document.getElementById('backgroundPreviewCanvas');
+            if (!previewCanvas) return null;
+            
+            const ctx = previewCanvas.getContext('2d');
+            const W = 888, H = 600; // カードサイズに合わせた固定サイズ
+            
+            // パラメータ取得
+            const GLYPH = (document.getElementById('bgEmojiInput').value || '？').trim();
+            const FONT_PX = clampInt(document.getElementById('bgFontPx').value, 24, 200) || 80;
+            const TILE_X = clampInt(document.getElementById('bgTileX').value, 80, 400) || 200;
+            const TILE_Y = clampInt(document.getElementById('bgTileY').value, 80, 400) || 200;
+            const OFFSET = Math.round(TILE_Y * clampInt(document.getElementById('bgOffsetRatio').value, 0, 100) / 100);
+            const BG_COLOR = document.getElementById('bgBgColor').value || '#FFFFFF';
+            
+            // 背景描画
+            ctx.save();
+            ctx.fillStyle = BG_COLOR;
+            ctx.fillRect(0, 0, W, H);
+            
+            // テキスト設定
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#E60012'; // 絵文字以外の記号用の色
+            
+            // フォント設定（絵文字対応）
+            ctx.font = `bold ${FONT_PX}px "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji","Twemoji Mozilla", Arial, Helvetica, "Noto Sans JP","Hiragino Kaku Gothic ProN","Yu Gothic", sans-serif`;
+            
+            // 段違い配置
+            let colIndex = 0;
+            for (let x = TILE_X / 2; x < W + TILE_X / 2; x += TILE_X, colIndex++) {
+                const yStart = (colIndex % 2 === 0) ? (TILE_Y / 2) : (TILE_Y / 2 + OFFSET);
+                for (let y = yStart; y < H + TILE_Y / 2; y += TILE_Y) {
+                    ctx.fillText(GLYPH, x, y);
+                }
+            }
+            ctx.restore();
+            
+            return previewCanvas;
+        }
+
+        // 背景プレビュー表示切り替え
+        function toggleBackgroundPreview() {
+            const preview = document.getElementById('backgroundPreview');
+            const btn = document.getElementById('previewBgBtn');
+            
+            if (preview.style.display === 'none' || preview.style.display === '') {
+                generateCustomBackgroundPreview();
+                preview.style.display = 'block';
+                btn.textContent = '🙈 非表示';
+            } else {
+                preview.style.display = 'none';
+                btn.textContent = '👁️ プレビュー';
+            }
+        }
+
+        // ヘルパー関数：数値の範囲制限
+        function clampInt(v, min, max) {
+            v = Math.round(Number(v));
+            if (!Number.isFinite(v)) return min;
+            return Math.min(max, Math.max(min, v));
+        }
 
         // 背景画像アップロード処理
         function handleBackgroundUpload(event) {
@@ -3900,13 +4141,10 @@ pattern_number,title,description
                 // テンプレート別の色設定（プリセット拡張）
                 const templateColors = {
                     academic: { primary: '#ffffff', secondary: '#d0d0d0', accent: '#ffffff' },
-                    nature: { primary: '#259e56', secondary: '#f4f269', accent: '#ffffff' },
-                    warm: { primary: '#fff95b', secondary: '#ff930f', accent: '#ffffff' },
-                    elegant: { primary: '#d4af37', secondary: '#c0c0c0', accent: '#ffffff' },
                     pastel: { primary: '#e9e9b7', secondary: '#d3f3f1', accent: '#ffffff' },
                     spring: { primary: '#fce9d7', secondary: '#eed4e8', accent: '#ffffff' },
                     summer: { primary: '#f6f6f6', secondary: '#2c6cbc', accent: '#ffffff' },
-                    autumn: { primary: '#f0c400', secondary: '#e1a3c7', accent: '#ffffff' },
+                    autumn: { primary: '#ffe883', secondary: '#e18cbe', accent: '#ffffff' },
                     winter: { primary: '#f1f5f9', secondary: '#475569', accent: '#ffffff' },
                     custom: { primary: '#f5f5f5', secondary: '#e8e8e8', accent: '#ffffff' }
                 };
